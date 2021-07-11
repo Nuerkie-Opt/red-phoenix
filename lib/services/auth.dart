@@ -1,4 +1,5 @@
 import 'package:ecommerceproject/components/alert.dart';
+import 'package:ecommerceproject/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -24,11 +25,12 @@ class AuthService {
   }
 
 //sign up with email and password
-  Future signUp(String email, String password, BuildContext context) async {
+  Future signUp(String name, String email, String password, BuildContext context) async {
     try {
       UserCredential userCredentials =
           await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = userCredentials.user;
+      await DatabaseService(uid: user?.uid).updateUserDData(name, email);
       return user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

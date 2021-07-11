@@ -1,4 +1,3 @@
-import 'package:ecommerceproject/components/alert.dart';
 import 'package:ecommerceproject/screens/authentication/components/button.dart';
 import 'package:ecommerceproject/screens/authentication/components/header.dart';
 import 'package:ecommerceproject/screens/authentication/components/textFields.dart';
@@ -54,12 +53,12 @@ class _SignUpState extends State<SignUp> {
                             });
                           }
                           if (isValidated) {
-                            dynamic result = await _auth.logIn(
-                                controllers[0].text, controllers[1].text, context);
+                            dynamic result = await _auth.signUp(controllers[0].text,
+                                controllers[1].text, controllers[2].text, context);
                             if (result == null) {
-                              print('sign in failed');
+                              print('sign up failed');
                             } else {
-                              print('signed in');
+                              print('signed up');
                               print(result);
                               Navigator.push(context,
                                   MaterialPageRoute(builder: (context) => Dashboard()));
