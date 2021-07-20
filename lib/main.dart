@@ -36,7 +36,7 @@ class _LotusAppState extends State<LotusApp> {
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
-        return loader();
+        return loader(context);
       },
     );
   }
@@ -55,16 +55,12 @@ class MyApp extends StatelessWidget {
         errorColor: Color(0xFF724017),
         fontFamily: 'Proxima Nova',
         primaryTextTheme: TextTheme(
-            headline1: TextStyle(
-                color: Color(0xFF721721), fontWeight: FontWeight.w600, fontSize: 18),
-            headline2: TextStyle(
-                color: Color(0xFF484848), fontWeight: FontWeight.w600, fontSize: 18),
-            headline3:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18),
+            headline1: TextStyle(color: Color(0xFF721721), fontWeight: FontWeight.w600, fontSize: 18),
+            headline2: TextStyle(color: Color(0xFF484848), fontWeight: FontWeight.w600, fontSize: 18),
+            headline3: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18),
             bodyText1: TextStyle(color: Color(0xFF721721), fontSize: 14),
             bodyText2: TextStyle(color: Color(0xFF484848), fontSize: 18),
-            subtitle1: TextStyle(
-                color: Color(0xFFc2c2c2), fontWeight: FontWeight.w200, fontSize: 12)),
+            subtitle1: TextStyle(color: Color(0xFFc2c2c2), fontWeight: FontWeight.w200, fontSize: 12)),
       ),
       home: SplashPage(),
     );
