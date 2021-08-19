@@ -1,10 +1,11 @@
-import 'package:ecommerceproject/components/alert.dart';
+import 'package:ecommerceproject/components/loading.dart';
 import 'package:ecommerceproject/screens/authentication/components/button.dart';
 import 'package:ecommerceproject/screens/authentication/components/header.dart';
 import 'package:ecommerceproject/screens/authentication/components/textFields.dart';
 import 'package:ecommerceproject/services/auth.dart';
 import 'package:ecommerceproject/screens/dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUp extends StatefulWidget {
   SignUp({Key? key}) : super(key: key);
@@ -14,10 +15,11 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  List<TextEditingController> controllers =
-      List<TextEditingController>.generate(4, (index) => TextEditingController());
+  List<TextEditingController> controllers = List<TextEditingController>.generate(4, (index) => TextEditingController());
   bool isValidated = false;
   AuthService _auth = AuthService();
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,8 +39,7 @@ class _SignUpState extends State<SignUp> {
                     textInput(controllers[0], "Name", Icons.person, isValidated),
                     textInput(controllers[1], "Email", Icons.person, isValidated),
                     passwordInput(controllers[2], "Password", Icons.person, isValidated),
-                    passwordInput(
-                        controllers[3], "Confirm password", Icons.person, isValidated),
+                    passwordInput(controllers[3], "Confirm password", Icons.person, isValidated),
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 40),
                       child: Button(
@@ -53,30 +54,30 @@ class _SignUpState extends State<SignUp> {
                               isValidated = true;
                             });
                           }
+                          loader(context);
                           if (isValidated) {
-                            dynamic result = await _auth.logIn(
-                                controllers[0].text, controllers[1].text, context);
+                            dynamic result = await _auth.signUp(
+                                controllers[0].text, controllers[1].text, controllers[2].text, context);
                             if (result == null) {
-                              print('sign in failed');
+                              print('sign up failed');
                             } else {
-                              print('signed in');
-                              print(result);
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => Dashboard()));
+                              final SharedPreferences prefs = await _prefs;
+                              prefs.setStringList("user", [controllers[0].text, controllers[1].text]);
+                              print('signed up');
+
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Dashboard()));
                             }
                           }
                         },
                       ),
                     ),
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Text("Already have an account ? ",
-                          style: TextStyle(color: Colors.black)),
+                      Text("Already have an account ? ", style: TextStyle(color: Colors.black)),
                       GestureDetector(
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: Text("Login",
-                            style: TextStyle(color: Theme.of(context).primaryColor)),
+                        child: Text("Login", style: TextStyle(color: Theme.of(context).primaryColor)),
                       ),
                     ]),
                   ],

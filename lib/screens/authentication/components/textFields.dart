@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget textInput(
-    TextEditingController controller, String hint, IconData icon, bool validate) {
+Widget textInput(TextEditingController controller, String hint, IconData icon, bool validate) {
   return Container(
     margin: EdgeInsets.only(top: 10),
     decoration: BoxDecoration(
@@ -14,15 +13,14 @@ Widget textInput(
       decoration: InputDecoration(
         border: InputBorder.none,
         hintText: hint,
-        errorText: validate ? null : 'Field must not be empty',
+        errorText: controller.text.isNotEmpty ? null : 'Field must not be empty',
         prefixIcon: Icon(icon),
       ),
     ),
   );
 }
 
-Widget passwordInput(
-    TextEditingController controller, String hint, IconData icon, bool validate) {
+Widget passwordInput(TextEditingController controller, String hint, IconData icon, bool validate) {
   return Container(
     margin: EdgeInsets.only(top: 10),
     decoration: BoxDecoration(
@@ -35,7 +33,7 @@ Widget passwordInput(
       controller: controller,
       decoration: InputDecoration(
         border: InputBorder.none,
-        errorText: validate ? null : 'Field must not be empty',
+        errorText: controller.text.isNotEmpty ? null : 'Field must not be empty',
         hintText: hint,
         prefixIcon: Icon(icon),
       ),

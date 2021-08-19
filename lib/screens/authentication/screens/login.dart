@@ -4,6 +4,7 @@ import 'package:ecommerceproject/screens/authentication/screens/sign_up.dart';
 import 'package:ecommerceproject/screens/authentication/components/textFields.dart';
 import 'package:ecommerceproject/screens/dashboard/dashboard.dart';
 import 'package:ecommerceproject/services/auth.dart';
+import 'package:ecommerceproject/components/loading.dart';
 import 'package:flutter/material.dart';
 
 class LogIn extends StatefulWidget {
@@ -12,8 +13,7 @@ class LogIn extends StatefulWidget {
 }
 
 class _LogInState extends State<LogIn> {
-  List<TextEditingController> controllers =
-      List<TextEditingController>.generate(2, (index) => TextEditingController());
+  List<TextEditingController> controllers = List<TextEditingController>.generate(2, (index) => TextEditingController());
   bool isValidated = false;
   final AuthService _auth = AuthService();
   @override
@@ -45,23 +45,21 @@ class _LogInState extends State<LogIn> {
                       padding: EdgeInsets.symmetric(vertical: 60),
                       child: Button(
                         onClick: () async {
-                          if (controllers[0].text.isNotEmpty &&
-                              controllers[1].text.isNotEmpty) {
+                          if (controllers[0].text.isNotEmpty && controllers[1].text.isNotEmpty) {
                             setState(() {
                               isValidated = true;
                             });
                           }
+                          loader(context);
                           if (isValidated) {
-                            dynamic result = await _auth.logIn(
-                                controllers[0].text, controllers[1].text, context);
+                            dynamic result = await _auth.logIn(controllers[0].text, controllers[1].text, context);
                             if (result == null) {
                               print('login failed');
                             } else {
                               print('logged in');
-
                               print(result);
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => Dashboard()));
+
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Dashboard()));
                             }
                           }
                         },
@@ -69,15 +67,12 @@ class _LogInState extends State<LogIn> {
                       ),
                     ),
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Text("Don't have an account ? ",
-                          style: TextStyle(color: Colors.black)),
+                      Text("Don't have an account ? ", style: TextStyle(color: Colors.black)),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (context) => SignUp()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => SignUp()));
                         },
-                        child: Text("Sign Up",
-                            style: TextStyle(color: Theme.of(context).primaryColor)),
+                        child: Text("Sign Up", style: TextStyle(color: Theme.of(context).primaryColor)),
                       ),
                     ])
                   ],
