@@ -15,6 +15,10 @@ class ProductList extends StatefulWidget {
 class _ProductListState extends State<ProductList> {
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    final double itemHeight = (size.height * 0.8) / 2;
+    final double itemWidth = size.width / 2;
+
     return Scaffold(
         appBar: SubPageAppbar(
           title: widget.productSubCategory,
@@ -23,7 +27,8 @@ class _ProductListState extends State<ProductList> {
           padding: const EdgeInsets.all(20.0),
           child: GridView.builder(
               itemCount: widget.productList.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, childAspectRatio: (itemWidth / itemHeight)),
               itemBuilder: (context, index) {
                 return ProductGridTile(product: widget.productList[index]);
               }),

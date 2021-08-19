@@ -9,6 +9,8 @@ class SubPageAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      leading: Container(),
+      centerTitle: true,
       backgroundColor: Theme.of(context).primaryColor,
       title: Text(
         title,
@@ -18,7 +20,7 @@ class SubPageAppbar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: Icon(Icons.shopping_cart_sharp, color: Colors.white),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => Cart()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
           },
         ),
         IconButton(
@@ -27,8 +29,7 @@ class SubPageAppbar extends StatelessWidget implements PreferredSizeWidget {
             color: Colors.white,
           ),
           onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Notifications()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => Notifications()));
           },
         ),
       ],

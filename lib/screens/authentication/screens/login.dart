@@ -4,8 +4,6 @@ import 'package:ecommerceproject/screens/authentication/screens/sign_up.dart';
 import 'package:ecommerceproject/screens/authentication/components/textFields.dart';
 import 'package:ecommerceproject/screens/dashboard/dashboard.dart';
 import 'package:ecommerceproject/services/auth.dart';
-import 'package:ecommerceproject/models/userInfo.dart';
-import 'package:ecommerceproject/utils/globalData.dart';
 import 'package:ecommerceproject/components/loading.dart';
 import 'package:flutter/material.dart';
 
@@ -59,10 +57,8 @@ class _LogInState extends State<LogIn> {
                               print('login failed');
                             } else {
                               print('logged in');
-
                               print(result);
-                              // GlobalData.user = User.fromMap(result.User.UserInfo);
-                              print(GlobalData.user);
+
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Dashboard()));
                             }
                           }

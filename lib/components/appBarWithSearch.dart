@@ -34,7 +34,7 @@ class SearchAppbar extends StatelessWidget implements PreferredSizeWidget {
                     IconButton(
                       icon: Icon(Icons.shopping_cart_sharp, color: Colors.white),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Cart()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
                       },
                     ),
                     IconButton(

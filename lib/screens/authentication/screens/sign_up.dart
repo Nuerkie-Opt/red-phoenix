@@ -1,11 +1,9 @@
 import 'package:ecommerceproject/components/loading.dart';
-import 'package:ecommerceproject/models/userInfo.dart';
 import 'package:ecommerceproject/screens/authentication/components/button.dart';
 import 'package:ecommerceproject/screens/authentication/components/header.dart';
 import 'package:ecommerceproject/screens/authentication/components/textFields.dart';
 import 'package:ecommerceproject/services/auth.dart';
 import 'package:ecommerceproject/screens/dashboard/dashboard.dart';
-import 'package:ecommerceproject/utils/globalData.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,10 +64,7 @@ class _SignUpState extends State<SignUp> {
                               final SharedPreferences prefs = await _prefs;
                               prefs.setStringList("user", [controllers[0].text, controllers[1].text]);
                               print('signed up');
-                              print(result);
 
-                              //GlobalData.user = User.fromMap(result["UserInfo"]);
-                              print(GlobalData.user);
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Dashboard()));
                             }
                           }

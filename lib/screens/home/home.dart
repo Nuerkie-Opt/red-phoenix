@@ -1,5 +1,8 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceproject/components/productListTile.dart';
 import 'package:ecommerceproject/models/product.dart';
+import 'package:ecommerceproject/utils/globalData.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerceproject/components/appBarWithSearch.dart';
 
@@ -11,17 +14,15 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List menuList = [
-    HomeItem(Icons.verified_user, "Men's Clothes"),
-    HomeItem(Icons.autorenew, "Women's Clothes"),
-    HomeItem(Icons.ac_unit, "Shoes"),
-    HomeItem(Icons.center_focus_strong, "Jewellry"),
-    HomeItem(Icons.question_answer, "Accessories"),
-    HomeItem(Icons.phone, "Kids"),
-  ];
+  bool? recentProducts;
 
   @override
   Widget build(BuildContext context) {
+    var collection = FirebaseFirestore.instance.collection('users');
+    var size = MediaQuery.of(context).size;
+    final double itemHeight = (size.height * 0.8) / 2;
+    final double itemWidth = size.width / 2;
+
     return Scaffold(
       appBar: SearchAppbar(
         text: 'Home',
@@ -31,62 +32,77 @@ class _HomeState extends State<Home> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              child: GridView.builder(
-                shrinkWrap: true,
-                padding: EdgeInsets.all(0),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-                itemBuilder: (context, index) {
-                  return Padding(
-                      padding: EdgeInsets.all(5.0),
-                      child: InkWell(
-                          onTap: () {},
-                          child: Column(
-                            children: [
-                              Card(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100.0)),
-                                elevation: 5,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Icon(
-                                    menuList[index].icon,
-                                    size: 30,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.bottomCenter,
-                                child: Text(
-                                  menuList[index].title,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(),
-                                ),
-                              )
-                            ],
-                          )));
-                },
-                itemCount: menuList.length,
-              ),
+            StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance.collection('banners').doc('discount').snapshots(),
+                builder: (_, snapshot) {
+                  if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+
+                  if (snapshot.hasData) {
+                    var output = snapshot.data!.data();
+                    var value = output!['images'];
+                    List<String> carouselImages = List<String>.from(value);
+                    return Container(
+                      child: CarouselSlider(
+                        options: CarouselOptions(
+                          autoPlay: true,
+                          aspectRatio: 2.0,
+                          enlargeCenterPage: true,
+                        ),
+                        items: imageSliders(carouselImages),
+                      ),
+                    );
+                  }
+                  return Center(child: CircularProgressIndicator());
+                }),
+            SizedBox(
+              height: 30,
             ),
             Text(
               'Recently Viewed',
               style: Theme.of(context).primaryTextTheme.headline2,
             ),
-            Container(
-              child: GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: SampleProductList.productList.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-                  itemBuilder: (context, index) {
-                    return ProductGridTile(product: SampleProductList.productList[index]);
-                  }),
-            )
+            StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: collection.doc(GlobalData.user?.uid).snapshots(),
+                builder: (_, snapshot) {
+                  if (snapshot.hasError) return Text('Error = ${snapshot.error}');
+                  if (snapshot.hasData) {
+                    var output = snapshot.data!.data();
+                    var value = output!['recentProducts'];
+                    if (value != null) {
+                      List<Product> recentProducts = (value as List).map((item) => Product.fromJson(item)).toList();
+                      return GridView.builder(
+                          shrinkWrap: true,
+                          physics: ScrollPhysics(),
+                          itemCount: recentProducts.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2, childAspectRatio: (itemWidth / itemHeight)),
+                          itemBuilder: (context, index) {
+                            return ProductGridTile(product: recentProducts[index]);
+                          });
+                    } else {
+                      return Container();
+                    }
+                  }
+                  return Center(child: CircularProgressIndicator());
+                })
           ],
         ),
       ),
     );
   }
+}
+
+List<Widget> imageSliders(List<String> imgList) {
+  return imgList
+      .map((item) => Container(
+            child: Container(
+                margin: EdgeInsets.all(5.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  child: Image.network(item, fit: BoxFit.cover, width: 1000.0),
+                )),
+          ))
+      .toList();
 }
 
 class HomeItem {

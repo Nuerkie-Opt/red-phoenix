@@ -1,6 +1,6 @@
 import 'package:ecommerceproject/components/appBarWithSearch.dart';
 import 'package:ecommerceproject/models/category.dart';
-import 'package:ecommerceproject/models/product.dart';
+import 'package:ecommerceproject/providers/productsProvider.dart';
 import 'package:ecommerceproject/screens/product/productListPage.dart';
 import 'package:flutter/material.dart';
 
@@ -38,7 +38,7 @@ class _CategoriesHomeState extends State<CategoriesHome> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ProductList(
-                                        productList: SampleProductList.productList
+                                        productList: Products.productsList!
                                             .where((element) =>
                                                 element.category == widget.categories[index].name.toLowerCase() &&
                                                 element.subCategory ==
