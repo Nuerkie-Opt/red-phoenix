@@ -1,18 +1,21 @@
 import 'dart:io';
 
 import 'package:ecommerceproject/components/alert.dart';
-import 'package:ecommerceproject/components/noSearchAppbar.dart';
 import 'package:ecommerceproject/models/userAddress.dart';
 import 'package:ecommerceproject/screens/account/addLocation.dart';
+import 'package:ecommerceproject/screens/account/settings.dart';
+import 'package:ecommerceproject/screens/notifications/notification.dart';
 import 'package:ecommerceproject/services/database.dart';
 import 'package:ecommerceproject/utils/globalData.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AccountHome extends StatefulWidget {
-  AccountHome({Key? key}) : super(key: key);
+  final FirebaseAnalytics analytics;
+  AccountHome({Key? key, required this.analytics}) : super(key: key);
 
   @override
   _AccountHomeState createState() => _AccountHomeState();
@@ -31,6 +34,8 @@ class _AccountHomeState extends State<AccountHome> {
   final imagePicker = ImagePicker();
   XFile? userPhoto;
   Widget? photoContainerChild;
+  bool editUsername = false;
+  TextEditingController nameController = TextEditingController();
 
   @override
   void initState() {
@@ -43,8 +48,36 @@ class _AccountHomeState extends State<AccountHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: SubPageAppbar(
-        title: 'Account',
+      appBar: AppBar(
+        leading: Container(),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+        title: Text(
+          "Account",
+          style: Theme.of(context).primaryTextTheme.headline3,
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SettingsPage(
+                            analytics: widget.analytics,
+                          )));
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.notifications,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Notifications()));
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -104,10 +137,34 @@ class _AccountHomeState extends State<AccountHome> {
                       'Username',
                       style: TextStyle(fontSize: 10, fontWeight: FontWeight.w200),
                     ),
-                    subtitle: Text(
-                      '${GlobalData.user?.displayName}',
-                      style: Theme.of(context).primaryTextTheme.bodyText2,
-                    ),
+                    subtitle: editUsername
+                        ? Column(
+                            children: [
+                              TextFormField(
+                                controller: nameController,
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Username',
+                                    prefixIcon: Icon(Icons.person)),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    user?.updateDisplayName(nameController.text);
+
+                                    await DatabaseService(uid: user?.uid)
+                                        .updateUserDData(nameController.text, user!.email!);
+                                  },
+                                  child: Text("Submit"))
+                            ],
+                          )
+                        : Text(
+                            '${GlobalData.user?.displayName}',
+                            style: Theme.of(context).primaryTextTheme.bodyText2,
+                          ),
+                    trailing: IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
                   ),
                   ListTile(
                     title: Text(
@@ -116,16 +173,6 @@ class _AccountHomeState extends State<AccountHome> {
                     ),
                     subtitle: Text(
                       '${GlobalData.user?.email}',
-                      style: Theme.of(context).primaryTextTheme.bodyText2,
-                    ),
-                  ),
-                  ListTile(
-                    title: Text(
-                      'Phone Number',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w200),
-                    ),
-                    subtitle: Text(
-                      '${GlobalData.user?.phoneNumber ?? " "}',
                       style: Theme.of(context).primaryTextTheme.bodyText2,
                     ),
                   ),
@@ -187,16 +234,6 @@ class _AccountHomeState extends State<AccountHome> {
           ],
         ),
       ),
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: 90.0),
-        child: FloatingActionButton(
-          onPressed: () {},
-          child: Icon(Icons.edit),
-          focusColor: Theme.of(context).primaryColor,
-          backgroundColor: Theme.of(context).primaryColor,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

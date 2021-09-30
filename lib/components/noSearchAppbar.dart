@@ -1,10 +1,11 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerceproject/screens/cart/cart.dart';
-import 'package:ecommerceproject/screens/notifications/notification.dart';
 
 class SubPageAppbar extends StatelessWidget implements PreferredSizeWidget {
-  const SubPageAppbar({Key? key, required this.title}) : super(key: key);
+  const SubPageAppbar({Key? key, required this.title, required this.analytics}) : super(key: key);
   final String title;
+  final FirebaseAnalytics analytics;
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +21,23 @@ class SubPageAppbar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: Icon(Icons.shopping_cart_sharp, color: Colors.white),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CartPage(
+                          analytics: analytics,
+                        )));
           },
         ),
-        IconButton(
-          icon: Icon(
-            Icons.notifications,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => Notifications()));
-          },
-        ),
+        // IconButton(
+        //   icon: Icon(
+        //     Icons.notifications,
+        //     color: Colors.white,
+        //   ),
+        //   onPressed: () {
+        //     Navigator.push(context, MaterialPageRoute(builder: (context) => Notifications()));
+        //   },
+        // ),
       ],
     );
   }

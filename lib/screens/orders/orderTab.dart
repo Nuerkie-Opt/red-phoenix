@@ -1,4 +1,5 @@
 import 'package:ecommerceproject/models/order.dart';
+import 'package:ecommerceproject/models/orderedProduct.dart';
 import 'package:ecommerceproject/screens/orders/details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +12,9 @@ class OrderTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.separated(
         padding: EdgeInsets.only(top: 20),
+        shrinkWrap: true,
         itemBuilder: (context, index) {
+          List<OrderedProduct> orderProducts = orders[index].products.map((e) => OrderedProduct.fromJson(e)).toList();
           return ListTile(
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => Details(order: orders[index])));
@@ -27,18 +30,18 @@ class OrderTab extends StatelessWidget {
                 itemBuilder: (context, ind) {
                   return ListTile(
                     title: Text(
-                      orders[index].products[ind].product.name,
+                      orderProducts[ind].product.name,
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Amount: ${orders[index].products[ind].salePrice.toString()}',
+                          'Amount: ${orderProducts[ind].salePrice.toString()}',
                           style: TextStyle(fontSize: 14),
                         ),
                         Text(
-                          'Quantity: ${orders[index].products[ind].quantity.toString()}',
+                          'Quantity: ${orderProducts[ind].quantity.toString()}',
                           style: TextStyle(fontSize: 14),
                         ),
                       ],

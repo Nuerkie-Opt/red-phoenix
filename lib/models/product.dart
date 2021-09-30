@@ -12,6 +12,8 @@ class Product {
   String category;
   String subCategory;
   String? description;
+  num quantity;
+  num costPrice;
   bool descriptionAvailable;
   Product(
       {required this.name,
@@ -23,8 +25,10 @@ class Product {
       this.colors,
       required this.discountPrice,
       required this.discounted,
+      required this.quantity,
       this.description,
       required this.descriptionAvailable,
+      required this.costPrice,
       this.sizes});
 
   Map<String, dynamic> toMap() {
@@ -40,7 +44,9 @@ class Product {
       'category': category,
       'subCategory': subCategory,
       'description': description,
-      'descriptionAvailable': descriptionAvailable
+      'descriptionAvailable': descriptionAvailable,
+      'quantity': quantity,
+      'costPrice': costPrice
     };
   }
 
@@ -57,65 +63,12 @@ class Product {
         category: map['category'],
         subCategory: map['subCategory'],
         description: map['description'],
+        quantity: map['quantity'],
+        costPrice: map['costPrice'],
         descriptionAvailable: map['descriptionAvailable']);
   }
 
   String toJson() => json.encode(toMap());
 
   factory Product.fromJson(String source) => Product.fromMap(json.decode(source));
-}
-
-class SampleProductList {
-  static var productList = [
-    Product(
-        name: 'Ripped Jeans',
-        price: 35.0,
-        productImage: 'assets/images/womenRippedJeans.jpg',
-        category: 'women',
-        subCategory: 'jeans',
-        discounted: true,
-        discountPrice: 20.0,
-        serialNumber: 087654,
-        sizes: [8, 10, 12, 14, 16, 18],
-        descriptionAvailable: true,
-        description:
-            'Et consectetur deserunt duis nisi esse culpa non. Exercitation velit deserunt cillum eu exercitation incididunt. Lorem laborum aute dolore dolore nostrud adipisicing enim sunt cillum nulla.Sint proident id ea sint fugiat mollit voluptate quis cillum non excepteur. Eu adipisicing reprehenderit proident pariatur ullamco est ullamco laboris occaecat magna dolore. Et culpa aliqua ad officia sunt do ut aute eiusmod.',
-        colors: ['dark blue', 'light blue', 'faded']),
-    Product(
-        name: 'Ripped Jeans',
-        price: 30.0,
-        productImage: 'assets/images/womenRippedJeans.jpg',
-        category: 'women',
-        subCategory: 'jeans',
-        serialNumber: 038373,
-        discounted: false,
-        discountPrice: 0.0,
-        descriptionAvailable: false,
-        sizes: [8, 10, 12, 14, 16, 18],
-        colors: ['dark blue', 'light blue', 'faded']),
-    Product(
-        name: 'Ripped Jeans',
-        price: 30.0,
-        productImage: 'assets/images/womenRippedJeans.jpg',
-        category: 'women',
-        subCategory: 'jeans',
-        discounted: false,
-        discountPrice: 0.0,
-        descriptionAvailable: false,
-        serialNumber: 873333,
-        sizes: [8, 10, 12, 14, 16, 18],
-        colors: ['dark blue', 'light blue', 'faded']),
-    Product(
-        name: 'Ripped Jeans',
-        price: 30.0,
-        productImage: 'assets/images/womenRippedJeans.jpg',
-        category: 'women',
-        subCategory: 'jeans',
-        discounted: false,
-        discountPrice: 0.0,
-        descriptionAvailable: false,
-        serialNumber: 097653,
-        sizes: [8, 10, 12, 14, 16, 18],
-        colors: ['dark blue', 'light blue', 'faded'])
-  ];
 }

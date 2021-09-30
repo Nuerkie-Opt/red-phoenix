@@ -8,11 +8,14 @@ import 'package:ecommerceproject/screens/categories/categories_home.dart';
 import 'package:ecommerceproject/screens/home/home.dart';
 import 'package:ecommerceproject/screens/orders/orders_home.dart';
 import 'package:ecommerceproject/services/auth.dart';
+import 'package:ecommerceproject/services/database.dart';
 import 'package:ecommerceproject/utils/globalData.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 class Dashboard extends StatefulWidget {
-  Dashboard({Key? key}) : super(key: key);
+  final FirebaseAnalytics analytics;
+  Dashboard({Key? key, required this.analytics}) : super(key: key);
 
   @override
   _DashboardState createState() => _DashboardState();
@@ -21,12 +24,17 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int _page = 0;
   List<Widget> _mainPages() => [
-        Home(),
+        Home(
+          analytics: widget.analytics,
+        ),
         CategoriesHome(
           categories: SampleCategory.categories,
+          analytics: widget.analytics,
         ),
-        OrdersHome(),
-        AccountHome()
+        OrdersHome(analytics: widget.analytics),
+        AccountHome(
+          analytics: widget.analytics,
+        )
       ];
 
   void onPageSelected(int index) {
@@ -38,6 +46,7 @@ class _DashboardState extends State<Dashboard> {
   final AuthService _auth = AuthService();
   getUserDetails() async {
     await _auth.getUserData();
+    await DatabaseService(uid: GlobalData.user?.uid).setLastSeen();
     print(GlobalData.user.toString());
   }
 
@@ -57,7 +66,7 @@ class _DashboardState extends State<Dashboard> {
       body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection("products").snapshots(),
           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (!snapshot.hasData) return Text('Something went wrong');
+            if (!snapshot.hasData) return Center(child: Text('Something went wrong'));
             var output = snapshot.data?.docs.map((doc) => doc.data()).toList();
             Products.productsList = (output as List).map((item) => Product.fromMap(item)).toList();
 
@@ -66,19 +75,20 @@ class _DashboardState extends State<Dashboard> {
       bottomNavigationBar: Padding(
         padding: EdgeInsets.only(bottom: 10),
         child: DotNavigationBar(
+            itemPadding: EdgeInsets.all(10),
             enableFloatingNavBar: true,
             currentIndex: _page,
             onTap: onPageSelected,
-            selectedItemColor: Theme.of(context).primaryColor,
-            unselectedItemColor: Color(0xFF484848),
-            backgroundColor: Colors.white,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white30,
+            backgroundColor: Theme.of(context).primaryColor,
             dotIndicatorColor: Colors.transparent,
             items: [
               DotNavigationBarItem(
                 icon: Icon(Icons.home, size: 30),
               ),
               DotNavigationBarItem(
-                icon: Icon(Icons.category, size: 30),
+                icon: Icon(Icons.dashboard, size: 30),
               ),
               DotNavigationBarItem(
                 icon: Icon(Icons.assignment_rounded, size: 30),

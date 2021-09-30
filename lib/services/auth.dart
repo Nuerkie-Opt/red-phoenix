@@ -12,6 +12,7 @@ class AuthService {
     try {
       UserCredential userCredentials = await _auth.signInWithEmailAndPassword(email: email, password: password);
       User? user = userCredentials.user;
+      await DatabaseService(uid: user?.uid).setLastSeen();
       return user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -33,6 +34,7 @@ class AuthService {
 
       user?.updateDisplayName(name);
       await DatabaseService(uid: user?.uid).updateUserDData(name, email);
+      await DatabaseService(uid: user?.uid).setLastSeen();
       return user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -46,7 +48,28 @@ class AuthService {
     }
   }
 
+  // reset password
+  Future resetPassword(String email, BuildContext context) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-email') {
+        alert(context, 'Email Address entered is invalid');
+      }
+      if (e.code == 'user-not-found') {
+        alert(context, 'Account not found');
+      }
+      return null;
+    }
+  }
+
 //log out
+  Future signOut() async {
+    try {
+      await _auth.signOut();
+    } catch (e) {}
+  }
+
 //get user data
   getUserData() {
     final User? user = _auth.currentUser;
