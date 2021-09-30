@@ -2,11 +2,13 @@ import 'package:ecommerceproject/components/appBarWithSearch.dart';
 import 'package:ecommerceproject/models/category.dart';
 import 'package:ecommerceproject/providers/productsProvider.dart';
 import 'package:ecommerceproject/screens/product/productListPage.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 class CategoriesHome extends StatefulWidget {
   final List<Category> categories;
-  CategoriesHome({Key? key, required this.categories}) : super(key: key);
+  final FirebaseAnalytics analytics;
+  CategoriesHome({Key? key, required this.categories, required this.analytics}) : super(key: key);
 
   @override
   _CategoriesHomeState createState() => _CategoriesHomeState();
@@ -18,6 +20,7 @@ class _CategoriesHomeState extends State<CategoriesHome> {
     return Scaffold(
         appBar: SearchAppbar(
           text: 'Categories',
+          analytics: widget.analytics,
         ),
         body: ListView.builder(
             itemCount: widget.categories.length,
@@ -38,13 +41,15 @@ class _CategoriesHomeState extends State<CategoriesHome> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ProductList(
-                                        productList: Products.productsList!
-                                            .where((element) =>
-                                                element.category == widget.categories[index].name.toLowerCase() &&
-                                                element.subCategory ==
-                                                    widget.categories[index].subCategories[ind].toLowerCase())
-                                            .toList(),
-                                        productSubCategory: widget.categories[index].subCategories[ind])));
+                                          productList: Products.productsList!
+                                              .where((element) =>
+                                                  element.category == widget.categories[index].name.toLowerCase() &&
+                                                  element.subCategory ==
+                                                      widget.categories[index].subCategories[ind].toLowerCase())
+                                              .toList(),
+                                          productSubCategory: widget.categories[index].subCategories[ind],
+                                          analytics: widget.analytics,
+                                        )));
                           },
                           title: Text(widget.categories[index].subCategories[ind]),
                         );

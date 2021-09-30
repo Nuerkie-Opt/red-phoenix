@@ -2,12 +2,14 @@ import 'package:ecommerceproject/components/toast.dart';
 import 'package:ecommerceproject/models/orderedProduct.dart';
 import 'package:ecommerceproject/models/product.dart';
 import 'package:ecommerceproject/providers/cartProvider.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ProductPage extends StatefulWidget {
   final Product product;
-  ProductPage({Key? key, required this.product}) : super(key: key);
+  final FirebaseAnalytics analytics;
+  ProductPage({Key? key, required this.product, required this.analytics}) : super(key: key);
 
   @override
   _ProductPageState createState() => _ProductPageState();
@@ -189,16 +191,31 @@ class _ProductPageState extends State<ProductPage> {
                 padding: EdgeInsets.symmetric(
                   horizontal: 20,
                 )),
-            onPressed: () {
-              OrderedProduct orderedProduct = OrderedProduct(
-                  product: widget.product,
-                  quantity: quantity,
-                  selectedSize: size,
-                  selectedColor: color,
-                  salePrice: widget.product.discounted ? widget.product.discountPrice : widget.product.price);
-              cart.addItem(orderedProduct);
-              showToastMessage("Item added to cart");
-              Navigator.pop(context);
+            onPressed: () async {
+              if (quantity > widget.product.quantity) {
+                showToastMessage("Quantity selected exceeds available products");
+              } else {
+                OrderedProduct orderedProduct = OrderedProduct(
+                    product: widget.product,
+                    quantity: quantity,
+                    selectedSize: size,
+                    selectedColor: color,
+                    salePrice: widget.product.discounted ? widget.product.discountPrice : widget.product.price);
+                await widget.analytics.logAddToCart(
+                  currency: 'GHS',
+                  itemId: '${widget.product.serialNumber}',
+                  itemName: '${widget.product.name}',
+                  itemCategory: '${widget.product.category} - ${widget.product.subCategory}',
+                  quantity: 1,
+                  price: widget.product.discounted
+                      ? widget.product.discountPrice.toDouble()
+                      : widget.product.price.toDouble(),
+                  origin: 'test origin',
+                );
+                cart.addItem(orderedProduct);
+                showToastMessage("Item added to cart");
+                Navigator.pop(context);
+              }
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

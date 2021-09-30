@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:ecommerceproject/models/order.dart';
 import 'package:ecommerceproject/models/product.dart';
+import 'package:ecommerceproject/utils/globalData.dart';
 import 'package:path/path.dart' as p;
 import 'package:ecommerceproject/services/auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -15,7 +16,17 @@ class DatabaseService {
   final CollectionReference orderCollection = FirebaseFirestore.instance.collection('orders');
 
   Future updateUserDData(String name, String email) async {
-    return await userCollection.doc(uid).set({"name": name, "email": email});
+    return await userCollection
+        .doc(uid)
+        .set({"name": name, "email": email, "userType": "customer", "dateSignedUp": DateTime.now()});
+  }
+
+  Future setLastSeen() async {
+    return await userCollection.doc(uid).update({"lastSeen": DateTime.now()});
+  }
+
+  Future trackOrders(int numberofOrders) async {
+    return await userCollection.doc(uid).update({"numberOfOrders": numberofOrders});
   }
 
   Future updateUserPhoto(String? photoUrl) async {
@@ -63,18 +74,22 @@ class DatabaseService {
   }
 
   Future saveOrder(Order order) async {
-    return await orderCollection.doc(uid).update({
-      "order": FieldValue.arrayUnion([order.toJson()])
+    await DatabaseService(uid: GlobalData.user.uid)
+        .trackOrders(GlobalData.numberOfOrders == null ? 1 : GlobalData.numberOfOrders + 1);
+
+    return await orderCollection.doc().set({
+      "products": order.products,
+      "id": order.id,
+      "date": order.date,
+      "deliveryFee": order.deliveryFee,
+      "amount": order.amount,
+      "userData": order.userData.toJson(),
+      "userAddress": order.userAddress.toJson(),
+      "orderNo": order.orderNo,
+      "status": order.status,
+      "deliveryName": order.deliveryName,
+      "phoneNumber": order.phoneNumber,
+      'paymentDetails': order.paymentDetails
     });
-  }
-}
-
-class GetData {
-  static CollectionReference productsCollection = FirebaseFirestore.instance.collection('products');
-
-  static Future<void> getData() async {
-    QuerySnapshot querySnapshot = await productsCollection.get();
-    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-    print(allData);
   }
 }

@@ -6,6 +6,7 @@ class UserData {
   String? phoneNumber;
   String? photoUrl;
   String? uid;
+  num? numberOfOrders;
   UserData({
     this.displayName,
     this.email,

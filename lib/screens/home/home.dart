@@ -3,11 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceproject/components/productListTile.dart';
 import 'package:ecommerceproject/models/product.dart';
 import 'package:ecommerceproject/utils/globalData.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerceproject/components/appBarWithSearch.dart';
+import 'package:ecommerceproject/providers/productsProvider.dart';
 
 class Home extends StatefulWidget {
-  Home({Key? key}) : super(key: key);
+  final FirebaseAnalytics analytics;
+  Home({Key? key, required this.analytics}) : super(key: key);
 
   @override
   _HomeState createState() => _HomeState();
@@ -15,7 +18,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool? recentProducts;
-
+  TextEditingController otpController = TextEditingController();
+  String? referenceCode;
   @override
   Widget build(BuildContext context) {
     var collection = FirebaseFirestore.instance.collection('users');
@@ -26,6 +30,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: SearchAppbar(
         text: 'Home',
+        analytics: widget.analytics,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -68,6 +73,7 @@ class _HomeState extends State<Home> {
                   if (snapshot.hasData) {
                     var output = snapshot.data!.data();
                     var value = output!['recentProducts'];
+                    GlobalData.numberOfOrders = output['numberOfOrders'] ?? 0;
                     if (value != null) {
                       List<Product> recentProducts = (value as List).map((item) => Product.fromJson(item)).toList();
                       return GridView.builder(
@@ -77,14 +83,29 @@ class _HomeState extends State<Home> {
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2, childAspectRatio: (itemWidth / itemHeight)),
                           itemBuilder: (context, index) {
-                            return ProductGridTile(product: recentProducts[index]);
+                            return ProductGridTile(
+                              product: recentProducts[index],
+                              analytics: widget.analytics,
+                            );
                           });
                     } else {
-                      return Container();
+                      List<Product> recentProducts = Products.productsList!.getRange(0, 4).toList();
+                      return GridView.builder(
+                          shrinkWrap: true,
+                          physics: ScrollPhysics(),
+                          itemCount: recentProducts.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2, childAspectRatio: (itemWidth / itemHeight)),
+                          itemBuilder: (BuildContext context, int index) {
+                            return ProductGridTile(
+                              product: recentProducts[index],
+                              analytics: widget.analytics,
+                            );
+                          });
                     }
                   }
                   return Center(child: CircularProgressIndicator());
-                })
+                }),
           ],
         ),
       ),

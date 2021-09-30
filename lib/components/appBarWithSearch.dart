@@ -1,14 +1,17 @@
+import 'package:ecommerceproject/components/toast.dart';
+import 'package:ecommerceproject/providers/productsProvider.dart';
+import 'package:ecommerceproject/providers/searchProvider.dart';
 import 'package:ecommerceproject/screens/cart/cart.dart';
-import 'package:ecommerceproject/screens/notifications/notification.dart';
+import 'package:ecommerceproject/screens/product/productListPage.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 class SearchAppbar extends StatelessWidget implements PreferredSizeWidget {
-  SearchAppbar({
-    required this.text,
-  });
+  SearchAppbar({required this.text, required this.analytics});
   final String text;
   final double height = 200;
   final TextEditingController searchController = TextEditingController();
+  final FirebaseAnalytics analytics;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -34,18 +37,26 @@ class SearchAppbar extends StatelessWidget implements PreferredSizeWidget {
                     IconButton(
                       icon: Icon(Icons.shopping_cart_sharp, color: Colors.white),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CartPage(
+                                      analytics: analytics,
+                                    )));
                       },
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.notifications,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Notifications()));
-                      },
-                    ),
+                    // IconButton(
+                    //   icon: Icon(
+                    //     Icons.notifications,
+                    //     color: Colors.white,
+                    //   ),
+                    //   onPressed: () {
+                    //     Navigator.push(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //             builder: (context) => Notifications()));
+                    //   },
+                    // ),
                   ],
                 ),
               ],
@@ -69,6 +80,26 @@ class SearchAppbar extends StatelessWidget implements PreferredSizeWidget {
                         controller: searchController,
                         decoration: InputDecoration(
                             hintText: "Search", border: InputBorder.none, contentPadding: EdgeInsets.all(10)),
+                        onSubmitted: (value) async {
+                          if (value.isNotEmpty)
+                            SearchProducts.productsList =
+                                Products.productsList!.where((element) => element.name.contains(value)).toList();
+                          if (SearchProducts.productsList!.isNotEmpty) {
+                            await analytics.logSearch(
+                              searchTerm: value,
+                            );
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProductList(
+                                          productList: SearchProducts.productsList!,
+                                          productSubCategory: "Search",
+                                          analytics: analytics,
+                                        )));
+                          } else {
+                            showToastMessage("Item not found");
+                          }
+                        },
                       ),
                     ),
                     IconButton(
@@ -76,8 +107,26 @@ class SearchAppbar extends StatelessWidget implements PreferredSizeWidget {
                         Icons.search,
                         color: Theme.of(context).primaryColor,
                       ),
-                      onPressed: () {
-                        print("your menu action here");
+                      onPressed: () async {
+                        if (searchController.text.isNotEmpty)
+                          SearchProducts.productsList = Products.productsList!
+                              .where((element) => element.name.contains(searchController.text))
+                              .toList();
+                        if (SearchProducts.productsList!.isNotEmpty) {
+                          await analytics.logSearch(
+                            searchTerm: searchController.text,
+                          );
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProductList(
+                                        productList: SearchProducts.productsList!,
+                                        productSubCategory: "Search",
+                                        analytics: analytics,
+                                      )));
+                        } else {
+                          showToastMessage("Item not found");
+                        }
                       },
                     ),
                   ],

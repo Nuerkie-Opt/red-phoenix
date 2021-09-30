@@ -1,12 +1,14 @@
 import 'package:ecommerceproject/components/cartProduct.dart';
 import 'package:ecommerceproject/components/toast.dart';
 import 'package:ecommerceproject/screens/cart/orderDetails.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ecommerceproject/providers/cartProvider.dart';
 
 class CartPage extends StatefulWidget {
-  CartPage({Key? key}) : super(key: key);
+  final FirebaseAnalytics analytics;
+  CartPage({Key? key, required this.analytics}) : super(key: key);
 
   @override
   _CartPageState createState() => _CartPageState();
@@ -64,7 +66,12 @@ class _CartPageState extends State<CartPage> {
                           onPressed: () {
                             cart.totalAmount <= 0
                                 ? showToastMessage('Please add some items')
-                                : Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetails()));
+                                : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => OrderDetails(
+                                              analytics: widget.analytics,
+                                            )));
                           },
                           child: Text(
                             'Checkout',

@@ -6,13 +6,15 @@ import 'package:ecommerceproject/providers/cartProvider.dart';
 import 'package:ecommerceproject/screens/product/productPage.dart';
 import 'package:ecommerceproject/services/database.dart';
 import 'package:ecommerceproject/utils/globalData.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ProductGridTile extends StatelessWidget {
-  const ProductGridTile({Key? key, required this.product}) : super(key: key);
+  const ProductGridTile({Key? key, required this.product, required this.analytics}) : super(key: key);
 
   final Product product;
+  final FirebaseAnalytics analytics;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,21 @@ class ProductGridTile extends StatelessWidget {
     return InkWell(
       onTap: () async {
         await DatabaseService(uid: GlobalData.user?.uid).recentlyViewedProducts(product);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ProductPage(product: product)));
+        await analytics.logViewItem(
+          itemId: '${product.serialNumber}',
+          itemName: '${product.name}',
+          itemCategory: '${product.category} - ${product.subCategory}',
+          price: product.discounted ? product.discountPrice.toDouble() : product.price.toDouble(),
+          currency: 'GHS',
+          value: 67.8,
+        );
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProductPage(
+                      product: product,
+                      analytics: analytics,
+                    )));
       },
       child: Card(
         elevation: 10,
@@ -64,13 +80,22 @@ class ProductGridTile extends StatelessWidget {
                   ),
                   Expanded(
                     child: IconButton(
-                        onPressed: () {
+                        onPressed: () async {
                           OrderedProduct orderedProduct = OrderedProduct(
                               product: product,
                               quantity: 1,
                               selectedSize: product.sizes![0],
                               selectedColor: product.colors![0],
                               salePrice: product.discounted ? product.discountPrice : product.price);
+                          await analytics.logAddToCart(
+                            currency: 'GHS',
+                            itemId: '${product.serialNumber}',
+                            itemName: '${product.name}',
+                            itemCategory: '${product.category} - ${product.subCategory}',
+                            quantity: 1,
+                            price: product.discounted ? product.discountPrice.toDouble() : product.price.toDouble(),
+                            origin: 'test origin',
+                          );
                           cart.addItem(orderedProduct);
                           showToastMessage("Item added to cart");
                         },

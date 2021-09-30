@@ -1,4 +1,5 @@
 import 'package:ecommerceproject/models/order.dart';
+import 'package:ecommerceproject/models/orderedProduct.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -9,6 +10,7 @@ class Details extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List orderStatus = order.status.split(RegExp(r'(?=[A-Z])'));
+    List<OrderedProduct> orderProducts = order.products.map((e) => OrderedProduct.fromJson(e)).toList();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -34,26 +36,26 @@ class Details extends StatelessWidget {
                   itemBuilder: (context, ind) {
                     return ListTile(
                       title: Text(
-                        order.products[ind].product.name,
+                        orderProducts[ind].product.name,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Amount: ${order.products[ind].salePrice.toString()}',
+                            'Amount: ${orderProducts[ind].salePrice.toString()}',
                             style: TextStyle(fontSize: 14),
                           ),
                           Text(
-                            'Quantity: ${order.products[ind].quantity.toString()}',
+                            'Quantity: ${orderProducts[ind].quantity.toString()}',
                             style: TextStyle(fontSize: 14),
                           ),
                           Text(
-                            'Size: ${order.products[ind].selectedSize.toString()}',
+                            'Size: ${orderProducts[ind].selectedSize.toString()}',
                             style: TextStyle(fontSize: 14),
                           ),
                           Text(
-                            'Color: ${order.products[ind].selectedColor.toString()}',
+                            'Color: ${orderProducts[ind].selectedColor.toString()}',
                             style: TextStyle(fontSize: 14),
                           ),
                         ],

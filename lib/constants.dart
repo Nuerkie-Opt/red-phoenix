@@ -1,0 +1,6 @@
+const PAYSTACK_SK = "sk_live_4fe2233889d04b89a41f0bb07439368e5972aeab";
+const PAYSTACK_PK = "pk_live_51c5aab2c4c469bed2d705a76b79141576d1c8d3";
+const PAYSTACK_TEST_SK = "sk_test_b0ece8b3fb988c0621979bb185dc80ca0d9a2bd0";
+
+const TINNG_CLIENT_ID = "3f7405fb-1585-42eb-a7b5-9531397c7b8c";
+const TINNG_CLIENT_SECRET = "fL62ESim3lQ52DVclxQn71OfJChwBtZXfuuh1HHT";
