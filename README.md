@@ -1,4 +1,4 @@
-# Red Phoenix
+# Lotus App
 
 A Flutter shopping application.
 
