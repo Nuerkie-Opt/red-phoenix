@@ -1,6 +1,6 @@
-# ecommerceproject
+# Red Phoenix
 
-A new Flutter project.
+A Flutter shoppinng application.
 
 ## Getting Started
 
