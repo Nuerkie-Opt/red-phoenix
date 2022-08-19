@@ -1,6 +1,6 @@
 # Red Phoenix
 
-A Flutter shoppinng application.
+A Flutter shopping application.
 
 ## Getting Started
 
